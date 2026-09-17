@@ -1,0 +1,1395 @@
+% =====================================================================
+%  README for the replication package
+%  Compile:  pdflatex README.tex, bibtex README, then pdflatex README.tex twice
+%  Produces: README.pdf  -- place at the root of the replication package,
+%            as required by JPE Data Policy section 3.4.
+% =====================================================================
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[hmargin=1in,vmargin=1in]{geometry}
+\usepackage{booktabs,longtable,array,tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[longnamesfirst]{natbib}   % same options as the paper
+\usepackage[hidelinks]{hyperref}
+\usepackage{xurl}   % allow long URLs to break anywhere, so they stay in-column
+\usepackage{titlesec}
+\usepackage{fancyvrb}
+\setlength{\emergencystretch}{3em}
+
+% \nolinkurl typesets like \texttt but, with xurl loaded, lets long paths
+% break across lines instead of overflowing table cells.
+\newcommand{\pkgfile}[1]{\nolinkurl{#1}}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{0.6em}{}
+\setlist{itemsep=2pt,parsep=0pt,topsep=3pt}
+
+\title{\textbf{Replication Package}\\[6pt]
+       \large Intermediate Input Prices and the Labor Share}
+\author{Juanma Castro-Vincenzi \and Benny Kleinman}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+
+
+\tableofcontents
+\clearpage
+
+% =====================================================================
+\section{Data Availability Statement}
+% =====================================================================
+
+All data used in this paper are secondary data obtained from public sources.
+No primary data were collected. All raw data
+files are included in the replication package. Whenever the raw data file is in .dta, .xls or .xlsx format a copy is provided in .csv format. Table~\ref{tab:das} lists the raw data families; Table~\ref{tab:conc} lists the supporting concordances. Together they identify what each file
+contains, where it came from, and its access date where recorded. The five
+BEA workbooks used to construct the quantitative model inputs are included
+in \pkgfile{data/raw/model_inputs/}; their original access dates were not
+recorded. Their embedded source dates and the construction steps are
+described below. Rebuilding these inputs requires no data downloads.
+
+\subsection*{Rights and permissions}
+
+We certify that we have legitimate access to, and permission to use, the
+data used in this paper. The authors' code is released under the BSD
+3-Clause License. The documentation and the authors' original contributions
+to derived data and outputs are released under CC~BY~4.0, only to the extent
+that the authors hold those rights. These grants do not relicense
+third-party material or override its source-data terms.
+
+The EM-DAT archive and its format-only CSV copy are distributed under
+CC~BY-NC-ND~4.0, as detailed below and in \pkgfile{LICENSE.txt}.
+Other source datasets retain their original providers' terms.
+
+
+\subsection*{EM-DAT archived source, access and reuse}
+
+The package includes \emph{The EM-DAT Emergency Events Database Archive},
+version~2.0, archived on 30~April~2026 at UCLouvain Dataverse
+\citep{emdat}. The archive covers 1900--2024 and contains 26,946 records and
+47 variables. Its permanent identifier is
+\url{https://doi.org/10.14428/DVN/I0LTPH}. The complete workbook
+\pkgfile{260430_emdat_archive.xlsx} is included without content changes,
+under the filename expected by the existing code:
+\pkgfile{data/raw/disaster_iv/disaster_iv_emdat.xlsx}.
+
+\textbf{Access.} No registration, payment or application is required to
+download this archived file. The included copy was downloaded on
+9~September~2026 (UTC). To obtain the same source, open the DOI, select
+version~2.0 and download \pkgfile{260430_emdat_archive.xlsx}, or use the
+fixed file link \url{https://dataverse.uclouvain.be/api/access/datafile/38893}.
+Save it at the package path above. Its SHA256 checksum is
+\pkgfile{21c210e479623144cef32c11c0a57c21094ea66f4ad0a0a248d8239f3a5e9847}.
+The data-column definitions and archived documentation are available with
+the same repository deposit. No download is needed when using the bundled
+copy.
+
+\textbf{Non-proprietary copy.} A UTF-8 CSV copy of the entire
+\texttt{EM-DAT Data} worksheet is included at
+\pkgfile{data/raw_csv_copy/disaster_iv/disaster_iv_emdat__EM-DAT_Data.csv}.
+It preserves all records, column names and cell values; only the file
+format changes. The original archived workbook has no separate
+\texttt{EM-DAT Info} worksheet.
+
+\textbf{Reuse conditions.} The provider releases this archive under
+Creative Commons Attribution--NonCommercial--NoDerivatives~4.0
+International (CC~BY-NC-ND~4.0):
+\url{https://creativecommons.org/licenses/by-nc-nd/4.0/}.
+Noncommercial sharing of the unadapted archive is permitted with
+attribution and the licence notice retained. A faithful change of file
+format is permitted. The licence does not permit sharing adapted material
+under its grant; the authors' BSD and CC~BY licences do not replace these
+EM-DAT terms. The source attribution, format-conversion notice and licence
+link are recorded in \pkgfile{LICENSE.txt}.
+
+\textbf{Analysis sample and verification.} The disaster-instrument code
+and Table~D.1 use events with Start Year 1991--2016, Disaster Group
+\texttt{Natural}, excluding \texttt{Epidemic}, \texttt{Infestation} and
+\texttt{Animal incident}. The 8,484 selected events and all seven fields
+read by these routines (Disaster Group, Disaster Type, ISO, Start Year,
+Total Deaths, Country and Disaster Subtype) match the earlier
+27~February~2026 living-data extract. An isolated run with the archived
+workbook and unchanged code reproduced the contents of Tables~D.1--D.3 exactly.
+The complete source workbooks differ in unused fields, other years and
+row order; the February living-data extract is not the archived file and
+is not included in this package. The applicable redistribution terms are
+those of the archived product, rather than those of the living-data portal.
+
+
+{\small\renewcommand{\arraystretch}{1.15}\setlength{\extrarowheight}{2pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{4.0cm}
+                    >{\raggedright\arraybackslash}p{5.0cm}
+                    >{\raggedright\arraybackslash}p{3.3cm}
+                    >{\raggedright\arraybackslash}p{2.3cm}@{}}
+\caption{Raw data files\label{tab:das}}\\
+\toprule
+\textbf{File(s)} & \textbf{Description} & \textbf{URL} & \textbf{Accessed}\\
+\midrule
+\endfirsthead
+\multicolumn{4}{@{}l}{\emph{Table \ref{tab:das} continued}}\\
+\toprule
+\textbf{File(s)} & \textbf{Description} & \textbf{URL} & \textbf{Accessed}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\pkgfile{aggregate/WPSID61.csv}
+& Producer price index for processed goods for intermediate demand.
+& \url{https://fred.stlouisfed.org/series/WPSID61}
+& Mar 2026\\[7pt]
+
+\pkgfile{aggregate/} 14 further FRED series
+& Producer, consumer and GDP price indices, exchange rates, manufacturing earnings and BLS productivity: \pkgfile{WPSID62}, \pkgfile{WPSFD49201}, \pkgfile{WPSFD49207}, \pkgfile{PRS85006173}, \pkgfile{GDP}, \pkgfile{GDPDEF}, \pkgfile{DGDSRG3M086SBEA}, \pkgfile{LCEAMN01USQ189S}, \pkgfile{NAGIGP01EZQ661S}, \pkgfile{JPNGDPDEFQISMEI}, \pkgfile{CCUSMA02EZQ618N}, \pkgfile{CCUSMA02JPQ618N}, \pkgfile{GOODS0EU28M086NEST}, \pkgfile{PITGCG02EZA661N}.
+& \url{https://fred.stlouisfed.org/series/<ID>}
+& Mar 2026\\[7pt]
+
+\pkgfile{aggregate/nipaQuarterly.csv}
+& BEA National Income and Product Accounts, quarterly.
+& \url{https://apps.bea.gov/national/Release/TXT/NipaDataQ.txt}
+& Mar 2026\\[7pt]
+
+\pkgfile{aggregate/fernald.xlsx}
+& Fernald utilisation-adjusted quarterly TFP.
+& \url{https://www.frbsf.org/economic-research/files/quarterly_tfp.xlsx}
+& Mar 2026\\[7pt]
+
+\pkgfile{aggregate/BEA_GDPbyInd_SIC_1947-1997.xls}
+& BEA historical industry accounts: value added, gross output, compensation and wages by industry, 1947--1997.
+& \url{https://apps.bea.gov/industry/xls/GDPbyInd_VA_SIC.xls}
+& Jul 2026\\[7pt]
+
+\pkgfile{aggregate/BEA_GDPbyInd_ValueAdded.xlsx}
+& BEA GDP by Industry, value added by industry, 1997--2018.
+& current release: \url{https://www.bea.gov/data/gdp/gdp-industry}
+& Oct 2019\\[7pt]
+
+\pkgfile{aggregate/BEA_GDPbyInd_GrossOutput.xlsx}
+& BEA GDP by Industry, gross output by industry, 1997--2018.
+& current release: \url{https://www.bea.gov/data/gdp/gdp-industry}
+& Oct 2019\\[7pt]
+
+\pkgfile{aggregate/BEA_NIPA_Section6_Dec2019.xlsx}
+& NIPA Section 6, December 2019 workbook; the annual Tables 6.2D and 6.3D used here were published July~30, 2019.
+& current release: \url{https://apps.bea.gov/national/Release/XLS/Survey/Section6all_xls.xlsx}
+& Not verified\\[7pt]
+
+\pkgfile{model_inputs/income_emp_tab.xlsx}
+& BEA NIPA Section 6, archived workbook used for model compensation and wages.
+& \url{https://apps.bea.gov/national/Release/XLS/Survey/Section6All_xls.xlsx}
+& Not recorded\\[7pt]
+
+\pkgfile{model_inputs/gross_output_tab.xlsx}
+& BEA GDP by Industry, archived gross output levels and quantity indexes for the model.
+& \url{https://apps.bea.gov/industry/Release/XLS/GDPxInd/GrossOutput.xlsx}
+& Not recorded\\[7pt]
+
+\pkgfile{model_inputs/int_input_tab.xlsx}
+& BEA GDP by Industry, archived intermediate input levels and price indexes for the model.
+& \url{https://apps.bea.gov/industry/Release/XLS/GDPxInd/IntermediateInputs.xlsx}
+& Not recorded\\[7pt]
+
+\pkgfile{model_inputs/value_added_tab.xlsx}
+& BEA GDP by Industry, archived value added levels for the model.
+& \url{https://apps.bea.gov/industry/Release/XLS/GDPxInd/ValueAdded.xlsx}
+& Not recorded\\[7pt]
+
+\pkgfile{model_inputs/fixed_assets_tab.xlsx}
+& BEA Fixed Assets Section 3, archived capital, depreciation and investment data for the model.
+& \url{https://apps.bea.gov/national/FixedAssets/Release/XLS/Section3All_xls.xlsx}
+& Not recorded\\[7pt]
+
+\pkgfile{external_gas_prices.csv}
+& EIA annual natural gas import prices for HS 271111 and 271121.
+& \url{https://www.eia.gov/dnav/ng/hist/n9103us3a.htm}
+& Mar 2026\\[7pt]
+
+\pkgfile{BEA-KLEMS/BEA-BLS-industry-level-production-account-1987-2021.xlsx}
+& BEA--BLS Integrated Industry-Level Production Account, the U.S.\ KLEMS accounts.
+& \url{https://www.bea.gov/sites/default/files/2023-09/BEA-BLS-industry-level-production-account-1987-2021.xlsx}
+& Sep 2023\\[7pt]
+
+\pkgfile{BIS/mod.csv}
+& Daily US dollar exchange rates.
+& \url{https://data.bis.org/topics/XRU}
+& Oct 2023\\[7pt]
+
+\pkgfile{census/NAICSUseDetail.txt}
+& BEA 1997 benchmark Input-Output Use table at NAICS detail.
+& \url{https://apps.bea.gov/industry/zip/ndn0306.zip}
+& Jul 2026\\[7pt]
+
+\pkgfile{census/concentration_ratios/1997/}, \pkgfile{census/concentration_ratios/2002/}, \pkgfile{census/concentration_ratios/2007/}, \pkgfile{census/concentration_ratios/2012/} --- 46 \pkgfile{.dat} files
+& Economic Census concentration ratios (CR4, CR8, CR20, CR50, HHI).
+& URLs listed in \pkgfile{census/concentration_ratios/SOURCE_URLS.txt}
+& Jul 2026\\[7pt]
+
+
+\pkgfile{cepii_tuv/tuv_96_x_2000.csv} through \pkgfile{tuv_96_x_2016.csv} (17 files)
+& CEPII Trade Unit Values, HS96 export regime
+& \url{https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=2}
+& Jul 2026\\[7pt]
+
+\pkgfile{comtrade/comtrade_1991.csv} through \pkgfile{comtrade_2016.csv} (6 files)
+& UN Comtrade U.S.\ imports from world, HS~1992 (H0), covering 1991--2020 in six five-year blocks. The 182,348 rows include HS6 records and other aggregation levels.
+& \url{https://comtradeplus.un.org/}
+& Feb 2026\\[7pt]
+
+\pkgfile{disaster_iv/disaster_iv_baci_trade_1997.csv}, \pkgfile{disaster_iv_baci_country_codes.csv}
+& CEPII BACI bilateral trade for 1997 and its country dictionary - version V202501.
+& \url{https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37}
+& Mar 2026\\[7pt]
+
+\pkgfile{disaster_iv/disaster_iv_emdat.xlsx}
+& Official EM-DAT Archive, version 2.0, 30 April 2026; 1900--2024. CC BY-NC-ND 4.0.
+& \url{https://doi.org/10.14428/DVN/I0LTPH}
+& 9 Sep 2026 (UTC)\\[7pt]
+
+\pkgfile{EUKLEMS/EUKLEMS_2025vintage_national_accounts.dta}, \pkgfile{..._capital_accounts.dta}
+& EU KLEMS 2025 release.
+& \url{https://euklems-intanprod-llee.luiss.it/}
+& Mar 2026\\[7pt]
+
+\pkgfile{EUKLEMS/EUKLEMS_2020vintage.dta}
+& EU KLEMS 2019 release.
+& \url{https://euklems.eu/bulk/Statistical_National-Accounts.dta}
+& Mar 2026\\[7pt]
+
+\pkgfile{EUKLEMS/WorldKLEMS_Canada_2012.xlsx}, \pkgfile{WorldKLEMS_Korea_2015.xlsx}
+& World KLEMS accounts for Canada (2012 release) and Korea (2015 release).
+& \url{http://www.worldklems.net/data/basic/}
+& Mar 2026\\[7pt]
+
+\pkgfile{EUKLEMS/WIOD/} 43 workbooks, \pkgfile{AUS_NIOT_nov16.xlsx} through \pkgfile{USA_NIOT_nov16.xlsx}
+& WIOD 2016 release national input-output tables.
+& \url{https://www.rug.nl/ggdc/valuechain/wiod/wiod-2016-release}
+& Mar 2026\\[7pt]
+
+\pkgfile{misc/CMO-Historical-Data-Annual.xlsx}
+& World Bank Pink Sheet annual commodity prices - ``Crude oil, average'' in nominal and constant 2010 US\$.
+& \url{https://www.worldbank.org/en/research/commodity-markets}
+& Jul 2026\\[7pt]
+
+\pkgfile{NBER-CES/nberces_1958-2018.dta}, \pkgfile{nberces-1958_2018_naics2012.dta}
+& NBER-CES Manufacturing Industry Database, NAICS-1997 and NAICS-2012 versions, release 2021a.
+& \url{https://www.nber.org/research/data/nber-ces-manufacturing-industry-database}
+& Mar 2021\\[7pt]
+
+\pkgfile{NBER-CES/nberces_1958-2011_naics.dta}
+& NBER-CES Manufacturing Industry Database.
+& \url{https://data.nber.org/nberces/nberces5811/naics5811.dta
+}
+& Jul 2026\\[7pt]
+
+\pkgfile{regional_data/QCEW/1990.annual.singlefile.csv} through \pkgfile{2020.annual.singlefile.csv} (31 files)
+& BLS Quarterly Census of Employment and Wages annual averages by area, ownership and industry; county records are aggregated to commuting zones by the cleaning code.
+& \url{https://data.bls.gov/cew/data/files/}
+& Jul 2026\\[7pt]
+
+\pkgfile{regional_data/bea_county/CAGDP2__ALL_AREAS_2001_2020.csv}, \pkgfile{CAINC30__ALL_AREAS_1969_2020.csv}
+& BEA county GDP by industry and county economic profile.
+& current release: \url{https://www.bea.gov/data/gdp/gdp-by-county}
+and \url{https://www.bea.gov/data/income-saving/personal-income-by-county}
+& Jun 2022\\[7pt]
+\multicolumn{4}{@{}p{\textwidth}@{}}{\small The county files bundled here are
+the historical extracts used by the code. The linked BEA pages provide
+current releases and access to previously published estimates; current
+downloads may differ from the bundled vintage. An exact historical
+download URL for these two extracts was not recorded.}\\[7pt]
+
+\pkgfile{trade/imp_detl_yearly_89n.dta} through \pkgfile{118n.dta} and the \pkgfile{exp_detl_yearly_} equivalents (60 files)
+& Schott U.S.\ import and export data by detailed product, 1989--2018.
+& \url{https://sompks4.github.io/sub_data.html}
+& Dec 2019\\[7pt]
+
+\end{longtable}
+}
+
+\subsection*{Inputs to the quantitative model}
+
+The Stata script \pkgfile{do/data_cleaning/model_inputs.do} constructs the
+two files read by Julia from the five archived BEA workbooks in
+\pkgfile{data/raw/model_inputs/}:
+\pkgfile{quant_model/data/data_manufacturing.csv}, covering total
+manufacturing, and \pkgfile{quant_model/data/subsector_data.csv}, covering
+the same variables for 19 manufacturing subsectors plus the durable,
+nondurable and total aggregates. The files contain annual observations for
+1998--2023: 26 rows for total manufacturing and 572 rows for the 22-category
+panel. Prebuilt copies are included; the Stata driver rebuilds them before
+the Julia model is run.
+
+The source workbooks are the 2025 vintages of BEA's NIPA Section 6,
+GDP by Industry and Fixed Assets Section 3
+\citep{bea_model_nipa2025,bea_model_gdpind2025,bea_model_fixedassets2025}.
+The three GDP by Industry workbooks identify September~25, 2025 as their
+publication date. The NIPA workbook identifies September~26, 2025 as its
+publication date and December~22, 2025 as its file-creation date. The Fixed
+Assets workbook records a file-creation date of September~15, 2025; this is
+not a recorded publication or access date. The original download dates are
+unknown. The URLs in Table~\ref{tab:das} serve changing BEA releases; use
+the included workbooks to reproduce the supplied inputs at their exact
+source vintage.
+
+Table~\ref{tab:model} identifies the 12 worksheets used in construction.
+The script matches the 22 manufacturing categories by their industry names,
+using the first occurrence in the manufacturing section when an aggregate
+name is repeated elsewhere in a BEA worksheet. It reshapes the annual
+series, retains 1998--2023, and merges the series by year and industry.
+\texttt{Dep} is current-cost depreciation divided by the same year's
+current-cost net capital stock. The script retains the supplied inputs'
+sector encoding and Stata float storage precision and rounds numeric
+variables to 0.001 before export. It checks the merge matches, nonmissing
+values and the 572-row panel and 26-row manufacturing series. Intermediate
+files are written to \pkgfile{data/temp/model_inputs/}.
+
+Plain-text copies of all 110 worksheets in the five workbooks, including
+their metadata worksheets, are provided in
+\pkgfile{data/raw_csv_copy/model_inputs/}. Each filename consists of the
+workbook stem, two underscores and the worksheet name; for example,
+\pkgfile{gross_output_tab__TGO105-A.csv}. The builder reads the archived
+Excel workbooks directly and needs no internet access or user-written
+Stata commands.
+
+
+{\small\renewcommand{\arraystretch}{1.15}\setlength{\extrarowheight}{2pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.4cm}
+                    >{\raggedright\arraybackslash}p{6.0cm}
+                    >{\raggedright\arraybackslash}p{6.5cm}@{}}
+\caption{Sources for the quantitative model inputs\label{tab:model}}\\
+\toprule
+\textbf{Variable} & \textbf{Description} & \textbf{BEA source}\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\emph{Table \ref{tab:model} continued}}\\
+\toprule
+\textbf{Variable} & \textbf{Description} & \textbf{BEA source}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\texttt{Comp}
+& Compensation of employees, manufacturing, millions of current dollars.
+& NIPA Table 6.2D; \pkgfile{income_emp_tab.xlsx}, sheet \pkgfile{T60200D-A}.
+\\[7pt]
+
+\texttt{Wage}
+& Wages and salaries per full-time equivalent employee, dollars per employee per year.
+& NIPA Table 6.6D; \pkgfile{income_emp_tab.xlsx}, sheet \pkgfile{T60600D-A}.
+\\[7pt]
+
+\texttt{VA}
+& Value added, manufacturing, millions of current dollars.
+& GDP by Industry, Value Added by Industry; \pkgfile{value_added_tab.xlsx}, sheet \pkgfile{TVA105-A}.
+\\[7pt]
+
+\texttt{Mat}
+& Intermediate inputs, manufacturing, millions of current dollars.
+& GDP by Industry, Intermediate Inputs by Industry; \pkgfile{int_input_tab.xlsx}, sheet \pkgfile{TII105-A}.
+\\[7pt]
+
+\texttt{GOmil}
+& Gross output, manufacturing, millions of current dollars.
+& GDP by Industry, Gross Output by Industry; \pkgfile{gross_output_tab.xlsx}, sheet \pkgfile{TGO105-A}.
+\\[7pt]
+
+\texttt{Capitalmil}
+& Current-cost net stock of private fixed assets, manufacturing, millions of dollars at year end.
+& Fixed Assets, Table 3.1ESI, Current-Cost Net Stock of Private Fixed Assets by Industry; \pkgfile{fixed_assets_tab.xlsx}, sheet \pkgfile{FAAt301ESI-A}.
+\\[7pt]
+
+\texttt{Investmentmil}
+& Investment in private fixed assets, manufacturing, millions of current dollars.
+& Fixed Assets, Table 3.7ESI, Investment in Private Fixed Assets by Industry; \pkgfile{fixed_assets_tab.xlsx}, sheet \pkgfile{FAAt307ESI-A}.
+\\[7pt]
+
+\texttt{Dep}
+& Annual depreciation divided by current-cost net stock; a fraction, not a percentage.
+& Fixed Assets, Table 3.4ESI (Current-Cost Depreciation) divided by Table 3.1ESI; \pkgfile{fixed_assets_tab.xlsx}, sheets \pkgfile{FAAt304ESI-A} and \pkgfile{FAAt301ESI-A}.
+\\[7pt]
+
+\texttt{GO\_ind}
+& Gross-output chain-type quantity index, 2017=100.
+& GDP by Industry, Chain-Type Quantity Indexes for Gross Output by Industry; \pkgfile{gross_output_tab.xlsx}, sheet \pkgfile{TGO103-A}.
+\\[7pt]
+
+\texttt{Pm}
+& Intermediate-input chain-type price index, 2017=100.
+& GDP by Industry, Chain-Type Price Indexes for Intermediate Inputs by Industry; \pkgfile{int_input_tab.xlsx}, sheet \pkgfile{TII104-A}.
+\\[7pt]
+
+\texttt{Cap\_ind}
+& Net-capital-stock chain-type quantity index, 2017=100.
+& Fixed Assets, Table 3.2ESI, Chain-Type Quantity Indexes for Net Stock of Private Fixed Assets by Industry; \pkgfile{fixed_assets_tab.xlsx}, sheet \pkgfile{FAAt302ESI-A}.
+\\[7pt]
+
+\texttt{Inv\_ind}
+& Investment chain-type quantity index, 2017=100.
+& Fixed Assets, Table 3.8ESI, Chain-Type Quantity Indexes for Investment in Private Fixed Assets by Industry; \pkgfile{fixed_assets_tab.xlsx}, sheet \pkgfile{FAAt308ESI-A}.
+\\
+
+\end{longtable}
+}
+
+\subsection*{Concordances and crosswalks}
+
+Table~\ref{tab:conc} lists the mapping files used to link classifications. All are
+included in the package. In addition to code correspondences, the supplied files
+retain population metadata (\texttt{cz00pop}) and establishment, shipment,
+payroll and employment mapping weights.
+
+{\small\renewcommand{\arraystretch}{1.15}\setlength{\extrarowheight}{2pt}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{4.6cm}
+                    >{\raggedright\arraybackslash}p{4.4cm}
+                    >{\raggedright\arraybackslash}p{5.9cm}@{}}
+\caption{Concordances and crosswalks\label{tab:conc}}\\
+\toprule
+\textbf{File} & \textbf{Original source} & \textbf{Notes}\\
+\midrule
+\endfirsthead
+\multicolumn{3}{@{}l}{\emph{Table \ref{tab:conc} continued}}\\
+\toprule
+\textbf{File} & \textbf{Original source} & \textbf{Notes}\\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\pkgfile{Concordances/naics_97to12.dta}, \pkgfile{naics_02to07.dta}, \pkgfile{naics_07to12.dta}
+& U.S. Census Bureau
+& NAICS classification concordances: 1997--2012, 2002--2007 and 2007--2012.\\[7pt]
+
+\pkgfile{Concordances/conc_naics97_naics12.dta}
+& \citet{nberces5818}
+& NAICS 1997 to 2012\\[7pt]
+
+\pkgfile{Concordances/naics2012_to_bea.dta}
+& Bureau of Economic Analysis
+& NAICS 2012 to BEA sector, summary and detail industry codes; Table~C.7 uses \texttt{bea\_summary}.\\[7pt]
+
+\pkgfile{Concordances/IOT_NAICS.dta}
+& Bureau of Economic Analysis
+& I-O industry to 6-digit NAICS.\\[7pt]
+
+\pkgfile{Concordances/HS696_to_IOT.dta}
+& Bureau of Economic Analysis
+& HS 1996 commodities to I-O commodities. \\[7pt]
+
+\pkgfile{Concordances/HS696_Commodities.dta}
+& \citet{fally}
+& Commodity list with HS 1992 and HS 1996 codes.\\[7pt]
+
+\pkgfile{Concordances/cty_czone.dta}
+& \citet{dorn2009}
+& County FIPS to 1990 commuting zone.\\[7pt]
+
+\pkgfile{EUKLEMS/WIOD/JobID-19_Concordance_H1_to_I3.CSV}
+& World Integrated Trade Solution (WITS)
+& HS 1996 to ISIC Revision 3.\\[7pt]
+
+\pkgfile{misc/naicsnames12.dta}, \pkgfile{naics3names12.dta}
+& U.S. Census Bureau
+& NAICS 2012 industry names.\\
+\end{longtable}
+}
+
+
+% =====================================================================
+\section{Contents of the Replication Package}
+% =====================================================================
+
+\begin{longtable}{@{}p{5.4cm}p{9.4cm}@{}}
+\toprule
+\textbf{Path} & \textbf{Contents}\\
+\midrule
+\endhead
+\pkgfile{README.pdf} & This document\\
+\pkgfile{LICENSE.txt} & Terms of use for the code and data in this package\\
+\pkgfile{README.tex}, \pkgfile{data_citations.bib}, \pkgfile{ecta-fullname.bst} & \LaTeX{} source of this document\\
+\pkgfile{do/main.do} & Stata driver: constructs model inputs and runs all empirical analyses\\
+\pkgfile{do/setup.do} & Validates the current package root and initializes Stata paths\\
+\pkgfile{do/data_cleaning/} & 21 scripts: raw data $\rightarrow$ model inputs and analysis data; \pkgfile{model_inputs.do} runs first\\
+\pkgfile{do/figures/} & 13 Stata analysis scripts, one per figure (or figure family), the shared style helper \pkgfile{graph_style.do}, and an editable schematic drawing, \pkgfile{fig2.tex}\\
+\pkgfile{do/tables/} & 19 scripts, one per table\\
+\pkgfile{data/raw/} & Source files, including preserved downloads and assembled source extracts\\
+\pkgfile{data/raw/model_inputs/} & Five archived BEA workbooks used to construct the quantitative model inputs\\
+\pkgfile{data/raw_csv_copy/} & Plain-text \texttt{.csv} copies of every raw file supplied in \texttt{.dta}, \texttt{.xls} or \texttt{.xlsx} format. Provided for readability only; no program reads from this folder\\
+\pkgfile{data/dta/} & Analysis data built by the cleaning scripts from \pkgfile{data/raw/}. Created by \pkgfile{do/main.do}, which rebuilds its contents\\
+\pkgfile{data/temp/} & Scratch space created by \pkgfile{do/main.do} when needed. The model-input builder creates its intermediates in \pkgfile{model_inputs/}\\
+\pkgfile{output/tables/} & 19 generated \texttt{.tex} tables and the supporting Table~D.1 country-list CSV\\
+\pkgfile{output/figures/} & 25 generated \texttt{.png} panels and the supplied Figure~2 schematic\\
+\pkgfile{quant_model/} & Julia code for the quantitative model\\
+\pkgfile{quant_model/data/} & Two prebuilt model-input CSV files, regenerated from the archived BEA workbooks by \pkgfile{do/data_cleaning/model_inputs.do}\\
+\pkgfile{quant_model/Project.toml}, \pkgfile{Manifest.toml} & Pinned Julia environment used by the supplied model and the verified replication run\\
+\pkgfile{quant_model/results/} & Model figures and table\\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Initial package contents.}
+Generated analysis data, figures, tables, model results and execution logs
+are omitted from the submission archive; the documented drivers recreate
+them. The output directories are retained, including the initially empty
+\pkgfile{quant_model/results/} directory required by the Julia driver.
+The supplied Figure~2 schematic, \pkgfile{output/figures/fig2.png}, is
+retained because it does not require computational reproduction. The two
+prebuilt model-input CSV files in \pkgfile{quant_model/data/} are also
+retained as documented below.
+
+\noindent The raw data directories are:
+\pkgfile{aggregate/} (FRED, NIPA, Fernald),
+\pkgfile{BEA-KLEMS/}, \pkgfile{BIS/}, \pkgfile{census/},
+\pkgfile{cepii_tuv/}, \pkgfile{comtrade/}, \pkgfile{Concordances/},
+\pkgfile{disaster_iv/}, \pkgfile{EUKLEMS/} (incl.\ WIOD and World KLEMS),
+\pkgfile{misc/}, \pkgfile{model_inputs/} (five archived BEA model workbooks),
+\pkgfile{NBER-CES/}, \pkgfile{regional_data/}
+(QCEW and BEA county), and \pkgfile{trade/}.
+
+\noindent The Stata-derived CSV copies preserve the stored numeric values,
+using up to 17 significant digits instead of the variables' display formats.
+Numeric value labels are retained as their underlying codes; dates retain their
+numeric Stata representation. String values, including leading zeros, are
+preserved. Standard numeric missing values are empty fields; extended missing
+values retain their literal codes \texttt{.a} through \texttt{.z}.
+When importing these CSVs, keep the source string columns as strings and
+read double-precision numeric columns as doubles. Source storage types,
+display formats, variable and value labels, checksums, and full-value
+validation results are recorded in
+\pkgfile{data/raw_csv_copy/stata_csv_validation.json}.
+
+The optional conversion utility \pkgfile{do/utilities/export_stata_csv.py}
+checks all raw \texttt{.dta} files and regenerates any CSV that fails exact
+comparison at the source storage precision. It was tested with Python~3.12,
+pandas~3.0.5 and NumPy~2.5.3. These dependencies are needed only to rerun this
+conversion utility; the Stata and Julia analysis drivers do not use it.
+From the replication root, run:
+\begin{Verbatim}[fontsize=\small]
+python do/utilities/export_stata_csv.py --source data/raw --output data/raw_csv_copy
+\end{Verbatim}
+Add \texttt{--verify-only} to validate the supplied copies without replacing
+them. The utility records its runtime and validates row and column order,
+every string and missing code, and every numeric value against the raw inputs.
+
+% =====================================================================
+\section{Data Construction and Analysis Variables}\label{sec:construction}
+% =====================================================================
+
+This section links the source files above to the datasets and variables
+used by the analysis. All paths are relative to the package root.
+The listed scripts are included under \pkgfile{do/data_cleaning/};
+\pkgfile{do/main.do} runs them in their required order. Source data remain
+in \pkgfile{data/raw/}; transformations are written to \pkgfile{data/dta/},
+\pkgfile{data/temp/} or \pkgfile{quant_model/data/}.
+
+The definitions below supplement the source labels, workbook units and
+provider documentation. Classification codes are identifiers. Years are
+calendar years unless another frequency is specified; logarithms are
+natural logs. Shares and ratios are fractions unless a percentage or
+index base is specified. Missing values are not zero unless explicitly
+replaced during construction.
+
+\subsection{U.S. industry data and derived variables}
+
+\paragraph{Main industry panel and units.}
+\pkgfile{do/data_cleaning/create_ss_dataset.do} builds
+\pkgfile{data/dta/mainregfile.dta}, indexed by six-digit NAICS-2012 industry
+and year. Its NBER-CES source uses millions of dollars for payroll,
+production-worker wages, shipments, materials, value added and capital;
+capital is a real stock. Total and production-worker employment are in
+thousands of workers, and production-worker hours are in millions of hours.
+The source price deflators \pkgfile{pimat}, \pkgfile{piship},
+\pkgfile{piinv} and \pkgfile{pien} have base 2012$=1$.
+
+{\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{3.0cm}
+                    >{\raggedright\arraybackslash}p{11.8cm}@{}}
+\toprule
+\textbf{Analysis variable} & \textbf{Construction and meaning}\\
+\midrule
+\endhead
+\pkgfile{labshr}, \pkgfile{llabshr}
+ & \pkgfile{pay/vadd}, and its log: payroll share of value added.\\
+\pkgfile{mat2va}, \pkgfile{mat2lab}
+ & \pkgfile{matcost/vadd} and \pkgfile{matcost/pay}; the latter's log is
+ \pkgfile{lmat2lab}.\\
+\pkgfile{w}, \pkgfile{lw}
+ & \pkgfile{prodw/prodh}, and its log: production-worker wages per hour
+ (dollars per hour).\\
+\pkgfile{cap2lab}, \pkgfile{lcap2lab}
+ & \pkgfile{cap/prodh}, and its log: real capital stock per production-worker
+ hour. This control has a different denominator from Table~C.3's
+ \pkgfile{lK2L=log(cap/emp)}, which uses total employees.\\
+\pkgfile{prodshr}
+ & \pkgfile{prode/emp}: production workers divided by total employment.\\
+\pkgfile{lpimat}, \pkgfile{lpiinv}
+ & Logs of the NBER-CES materials and investment price deflators.\\
+\pkgfile{impen}, \pkgfile{impen_china}
+ & \pkgfile{im/(vship+im-ex)} and \pkgfile{im_china/(vship+im-ex)}:
+ imports divided by domestic absorption; the China measure changes the
+ numerator only. All four monetary inputs use millions of dollars.\\
+\pkgfile{vadd_90}, \pkgfile{mat2va_90}
+ & Industry value added and materials/value added in 1990, held fixed
+ within industry. The suffixes \pkgfile{_58},
+ \pkgfile{_70}, \pkgfile{_72}, \pkgfile{_80} and \pkgfile{_97}
+ identify analogous reference-year values used in other exercises.\\
+\pkgfile{treat}
+ & \pkgfile{mat2va_90*lpimat}: the main endogenous regressor.\\
+\pkgfile{naics3}, \pkgfile{n3y}
+ & The first three NAICS digits, and the three-digit-industry/year group
+ identifier used for subsector-by-year fixed effects.\\
+\bottomrule
+\end{longtable}}
+
+Table~1 uses years 1991--2016 and a nonmissing
+\pkgfile{shift_share_ct}; regressions additionally require nonmissing
+outcomes and regressors, plus positive weights in weighted columns. Those columns use
+\pkgfile{vadd_90}. The individual table scripts give the controls, fixed
+effects and sample restrictions for each column. Tables~C.3 and C.5 create
+additional logged ratios locally: materials/value added, value added/sales,
+materials/payroll, materials/real capital, real capital/value added, and
+real capital/total employees, as applicable to each table.
+
+\paragraph{Schott trade inputs.}
+\pkgfile{do/data_cleaning/trade.do} reads the 1989--2018 import and export
+files under \pkgfile{data/raw/trade/}, retaining records whose supplied
+NAICS code begins with 3. It sums general import value
+(\pkgfile{gen_val_yr}) and total export value (\pkgfile{all_val_yr}) by
+industry and year and divides by $10^6$. China imports use country code
+5700; the additional \pkgfile{im_nafta} field uses Canada (1220) and Mexico
+(2010). The resulting files are
+\pkgfile{data/dta/imports_1989-2018_naics.dta} and
+\pkgfile{data/dta/exports_1989-2018_naics.dta}.
+
+The main-panel builder links the NAICS-1997 NBER-CES panel and these external
+series to NAICS-2012 through
+\pkgfile{data/raw/Concordances/conc_naics97_naics12.dta}, retaining links
+with \pkgfile{pay9712>0.7}. When multiple source industries map to one
+NAICS-2012 industry, import and export values are raw sums; exposure shares
+and shift-share variables are means weighted by source-industry shipments
+in the corresponding year. The resulting industry/year records are merged
+with the NAICS-2012 NBER-CES outcomes and the concentration data.
+
+\paragraph{Commodity prices and cleaning.}
+\pkgfile{do/data_cleaning/cep_cleaned.do} reads the six bundled Comtrade
+files (U.S. imports from the world, HS92, 1991--2020). It retains six-digit
+leaf records with code greater than 10000, positive reported quantity and
+trade value, usable unit values, denominator quantity greater than 1 and
+trade value at least US\$1,000. Its exact lists of product-specific repairs
+are declared near the beginning of that script.
+
+Unit values start as trade value divided by reported quantity. For the
+listed quantity-scale cases, 2000--2005 quantities are multiplied by 1000.
+For crude oil and the two gas codes, positive net weight in kilograms is
+used when present. LNG (271111) and gaseous natural gas (271121) use the
+annual paths in \pkgfile{data/raw/external_gas_prices.csv} when available:
+EIA series \pkgfile{n9103us3A} and \pkgfile{n9100us3A}, respectively,
+both reported in dollars per thousand cubic feet. Their source pages are
+\url{https://www.eia.gov/dnav/ng/hist/n9103us3a.htm} and
+\url{https://www.eia.gov/dnav/ng/hist/n9100us3a.htm}.
+Subsequent normalization uses within-product price changes, not a common
+physical unit across products.
+
+For non-energy products, the quantity-unit code must match its 1997 value.
+A consecutive-year unit-value ratio is discarded if it lies below 0.2 or
+above 5 times that product's median consecutive-year ratio. Energy products
+(HS chapter 27) are exempt from those unit-consistency and growth screens.
+For the designated residual series, the code computes annual product-level
+medians of CEPII export unit values from the 2000--2016 files, then sets the
+post-1999 path to the observed 1999 unit value times the CEPII median in year
+$t$ divided by its 2000 median. Thus the spliced 2000 level equals the 1999
+anchor. Replacement requires the relevant observed anchor and CEPII values.
+
+Each surviving product price is normalized to 1997$=100$; observations
+without that index are dropped. After mapping to the commodity list,
+non-energy product series with any index value above 20,000 are removed.
+HS92-to-HS96 links use
+\pkgfile{data/raw/Concordances/HS696_Commodities.dta}; HS96-to-IO links and
+the supplied within-commodity \pkgfile{weight} variable use
+\pkgfile{data/raw/Concordances/HS696_to_IOT.dta}. The cleaner saves the
+mapped product data as \pkgfile{data/dta/Commodity_Prices_HS96.dta}
+and the weighted-mean IO-commodity/year price indexes as
+\pkgfile{data/dta/Commodity_Prices_Weight_comtrade_new.dta}.
+The full cleaned HS92 data and the intermediate filter-count file are
+also written by this script.
+
+\paragraph{Input-output exposures and instruments.}
+\pkgfile{do/data_cleaning/create_shares.do} reads
+\pkgfile{data/raw/census/NAICSUseDetail.txt}. Compensation is the
+\pkgfile{V00100} row; after excluding final-demand and special-category
+rows/columns, missing industry/commodity combinations are filled with zero.
+Direct exposure is \pkgfile{use_value} divided by the using industry's
+summed intermediate use plus compensation. The file retains the supplied
+use values without subtracting their included margins. The alternative
+exposure matrix is $A(I-A)^{-1}$, using the cost-share matrix $A$; both
+exposures are saved in \pkgfile{data/dta/IOLinkages.dta}.
+
+\pkgfile{do/data_cleaning/create_ss_instrument.do} joins these exposures
+to available commodity price indexes $P$, multiplies each exposure by
+$\log(P/100)$, and sums by industry and year.
+\pkgfile{shift_share_ct} uses direct exposures;
+\pkgfile{shift_share_leontieff_ct} uses the alternative matrix. The
+\pkgfile{shift_share_sums1_ct} variant divides use values by total use
+across commodities present in the joined data in 2000 and carries those
+weights across years. The direct-exposure variants
+\pkgfile{shift_share_e_ct} and \pkgfile{shift_share_ne_ct} sum energy
+and non-energy components separately. \pkgfile{share_ct} sums
+direct shares over the commodity records available in each year.
+\pkgfile{data/raw/Concordances/IOT_NAICS.dta} maps these results to
+NAICS-1997 in \pkgfile{data/dta/shiftshare_ct.dta}; the main-panel mapping
+described above then produces the NAICS-2012 variables used in regressions.
+
+\paragraph{Industry concentration.}
+\pkgfile{do/data_cleaning/build_censuscr_raw.do} extracts the Census
+1997, 2002, 2007 and 2012 concentration files, retains six-character NAICS
+industries and the all-establishments tax-status universe where specified,
+and converts flagged values to missing. It writes
+\pkgfile{data/dta/censuscr_97-02-07-12_n6.dta}.
+\pkgfile{do/data_cleaning/concentration.do} retains manufacturing and
+maps 1997 directly to 2012, 2002 through 2007 to 2012, and 2007 to 2012
+using the supplied Census concordances. For multiple source industries
+mapped to one destination, company counts and sales are summed; positive,
+nonmissing concentration ratios and HHI values are combined as unweighted
+harmonic means. The output is \pkgfile{data/dta/concentration.dta}.
+The main-panel builder divides CR4, CR8, CR20 and CR50 by 100 to express
+sales shares as fractions. HHI-50 retains the Census index scale;
+\pkgfile{lhhi50} is its natural log. Table~C.10 uses CR4 and log HHI-50
+on the common nonmissing sample in the four Census years.
+
+\paragraph{BEA-KLEMS and the BEA-subsector specification.}
+\pkgfile{do/data_cleaning/BEA_KLEMS.do} reshapes worksheets 3--30 of the
+bundled 1987--2021 production-account workbook, harmonizes industry names,
+merges its NAICS-code sheet and excludes state and local government. It
+saves \pkgfile{data/dta/BEA-BLS_klems_clean.dta}. Nominal compensation,
+value added and output are in millions of dollars; the quantity series,
+including labor hours, are indexes with 2012$=100$.
+
+Figures~3, 4 and C.2 use total college plus non-college labor compensation
+for labor costs and materials plus energy compensation for materials.
+Implicit prices divide the corresponding nominal expenditure by its
+quantity index. Materials and energy price growth is combined using the
+average of current and lagged expenditure shares (Tornqvist weights), with
+analogous expenditure-share aggregation across industries. Labor shares
+are total labor compensation divided by value added.
+
+\pkgfile{do/tables/tabC7.do} separately maps the main panel to BEA summary
+industries. It applies value-added-weighted sums to NBER-CES quantities and
+value-added-weighted means to prices and instruments before merging BEA
+outcomes. Missing aggregated import/export values are set to zero in this
+specification. Its labor share uses BEA compensation/value added, whereas
+baseline materials intensity uses the aggregated NBER-CES
+\pkgfile{matcost/vadd}. Its materials price is BEA materials
+compensation/materials quantity, without adding energy. The services share
+is services compensation divided by services plus materials plus energy
+compensation; the services price divides services compensation by its
+quantity index. Wage and capital controls divide compensation and the
+aggregated NBER-CES capital stock, respectively, by the BEA labor-hours
+index. Reference-year intensity and weighted regression weights use 1990.
+
+\paragraph{Oil instrument.}
+\pkgfile{do/data_cleaning/oilprices.do} reads the nominal and real annual
+``Crude oil, average'' columns from the bundled World Bank Pink Sheet,
+retains years through 2021 and writes \pkgfile{data/dta/oilprices.dta}.
+Real oil prices are in constant 2010 US dollars per barrel. Table~3 uses 1970--1980:
+its treatment is 1972 materials/value added times log materials price,
+and its instrument is 1972 energy expenditure/value added times log real
+oil price. Weighted columns use 1972 value added.
+
+\paragraph{Aggregate descriptive series.}
+\pkgfile{do/data_cleaning/agg_labour_shares.do} constructs four quarterly
+shares: NIPA compensation divided by compensation plus rental income,
+corporate profits, net interest and depreciation; nonfinancial-corporate
+compensation/gross value added; one minus Fernald's capital-share series;
+and the BLS nonfarm-business index rescaled to 0.639 in 2000Q1. Their
+unweighted arithmetic mean is \pkgfile{ls_mean} in
+\pkgfile{data/dta/agglabshr.dta}.
+\pkgfile{do/data_cleaning/agg_fred_prices.do} averages the listed FRED
+series to quarters in \pkgfile{data/temp/fred_prices.dta}. Figure~1 then
+averages quarterly series to years, reads the bundled annual WPSID61
+series, divides processed and unprocessed intermediate-input PPIs by the
+PCE-goods price index, and normalizes both relative prices to 2000$=100$.
+
+For Figure~B.1, \pkgfile{do/data_cleaning/bea_historical.do} assembles
+\pkgfile{data/dta/bea_historical.dta}: BEA SIC-basis accounts supply years
+through 1997 and modern BEA accounts supply 1998--2018; the 1972-SIC source
+wins at the overlapping 1987 observation. NBER-CES totals use the
+NAICS-1997 file before 2012, the NAICS-2012 file from 2012, and the separate
+1958--2011 release for 2007--2011; NBER-CES values after 2016 are set to
+missing for this comparison. BEA intermediate expenditure in Figure~B.1 is
+gross output minus value added.
+
+
+\subsection{Regional analysis data (Table 2)}
+
+\pkgfile{do/data_cleaning/qcew_panels.do} reads the 1990--2020 annual
+QCEW CSV files in \pkgfile{data/raw/regional_data/QCEW/}. It retains private
+ownership (\texttt{own\_code=5}), county records at sector and four-digit
+NAICS levels (\texttt{agglvl\_code=74,76}), excludes area codes containing
+\texttt{999} and zero-employment records, and maps county FIPS to 1990
+commuting zones with \pkgfile{data/raw/Concordances/cty_czone.dta}.
+It sums employment, establishments and annual payroll, and averages weekly
+wages using employment weights. The outputs are
+\pkgfile{data/dta/QCEW_naics2_panel.dta} and
+\pkgfile{data/dta/QCEW_naics4_panel.dta}, indexed by commuting zone,
+industry code and year. Payroll is in dollars; weekly wages are dollars
+per week.
+
+\pkgfile{do/data_cleaning/bea_county.do} reads the CAGDP2 and CAINC30
+CSV files in \pkgfile{data/raw/regional_data/bea_county/}, retains county
+FIPS, reshapes annual values through 2020, and converts nonnumeric value
+markers to missing. Its outputs are \pkgfile{data/dta/bea_county_gdp.dta}
+and \pkgfile{data/dta/bea_county_otheraggdata.dta}, indexed by county
+\texttt{gcode} and year. CAGDP2 GDP values are in thousands of dollars.
+
+\pkgfile{do/data_cleaning/regional.do} combines these panels with
+\pkgfile{data/dta/mainregfile.dta}. It first averages six-digit industry
+log price changes and commodity instruments to four-digit NAICS using
+2001 materials-cost weights. Changes are measured from each industry's
+first available observation from 2001 onward. It then averages four-digit
+prices and instruments within each commuting-zone/year using that year's
+industry payroll weights. National industry materials costs, shipments
+and trade are allocated to regions using their current-year shares of
+industry payroll. County codes are harmonized using the recodes in the
+script; matched county data are summed to commuting zones. The merged
+panel retains commuting zones with all 18 years from 2001--2018.
+
+The output \pkgfile{data/dta/regional.dta} has key
+\texttt{cz1990, year}. \texttt{LS} is manufacturing payroll divided by
+manufacturing GDP, after converting payroll to thousands of dollars;
+\texttt{manuf\_share} is manufacturing employment divided by total
+private employment. \texttt{impen} and \texttt{impen\_china} divide the corresponding
+allocated imports by shipments plus imports minus exports.
+\texttt{M2VA} is allocated materials costs divided by manufacturing GDP
+(materials costs are converted from millions to thousands of dollars).
+\texttt{treat} and \texttt{iv} multiply the regional price change
+\texttt{lpm} and instrument change \texttt{lpmiv}, respectively, by
+\texttt{M2VA2001}. The regression weight \texttt{ww} is 2001 manufacturing
+GDP, distinct from the annual payroll weights inside the indices.
+\pkgfile{do/tables/tab2.do} uses log labor share, log weekly wages,
+\texttt{lpk}, and the additional employment/trade controls specified there;
+its usable estimation observations cover 2001--2016. It writes
+\pkgfile{output/tables/tab2.tex}.
+
+\subsection{Cross-country analysis data (Table 4 and Figures F.1--F.2)}
+
+\pkgfile{do/data_cleaning/crosscountry_panel_build.do} combines the
+EU-KLEMS national and capital accounts in \pkgfile{data/raw/EUKLEMS/},
+the historical file \pkgfile{EUKLEMS_2020vintage.dta}, and the Canada and
+Korea World KLEMS workbooks. Country, industry and year identify records.
+Missing or zero EU-KLEMS price indices are filled using the historical
+vintage scaled by the mean overlap ratio for that country/industry;
+series with at most three usable newer-vintage price observations use
+the historical series directly where available. Missing compensation and
+hours are filled directly. Canadian and Korean sectors are mapped to
+the common manufacturing groups by summing levels and using current-year
+value-added weights for aggregated price indices. Korean price indices
+are nominal/real ratios normalized to 2000=100. Canada has no separate
+C21 or C27 observations: those activities remain within its combined C20
+and C26 source categories. The constructed panel sets investment and capital-account fields
+to missing for Canada and Korea.
+
+The intermediate \pkgfile{data/dta/klems_panel_2025.dta} retains source
+currency units. It defines \texttt{labshr=comp/va},
+\texttt{mat2va=ii/va}, \texttt{w=comp/h\_empe} (compensation per employee
+hour in source units), and \texttt{pmat2pva=ii\_pi/va\_pi}; the variables \texttt{llabshr}, \texttt{lmat2va}, \texttt{lw},
+\texttt{lii\_pi}, \texttt{lva\_pi}, \texttt{lgo\_pi} and
+\texttt{lpmat2pva} are natural logs of the corresponding levels. Nonpositive value added,
+intermediate inputs, compensation or employment, and compensation above
+value added, are excluded during construction.
+
+\pkgfile{do/data_cleaning/exchange_rates.do} averages the nonmissing daily
+BIS rates in \pkgfile{data/raw/BIS/mod.csv} by country/year to create
+\pkgfile{data/dta/fx.dta}. Rates are local currency per US dollar; the BIS
+source expresses euro-area legacy currencies in euros, including before
+adoption using fixed conversion rates.
+\pkgfile{do/data_cleaning/crosscountry_iv.do} uses the year-2000 sheets of
+the WIOD national tables and the cleaned commodity-price file
+\pkgfile{data/dta/comtrade_lit_energysafe_gassplice_cepiisplice11.dta}.
+It sums domestic and imported WIOD flows, divides by each fine using
+sector's intermediate inputs, and maps commodity prices through the
+supplied HS/WITS concordances. Prices are simple means within supplying
+sector/year; interior missing years are linearly interpolated. The log
+shock is \texttt{log(ind\_tuv/100)}. Matched IO shares are multiplied by
+the corresponding KLEMS year-2000 \texttt{ii/(ii+comp)}; the multiplier is
+one when those data are missing. Unmatched supplying sectors are omitted
+without renormalizing the remaining shares. The FX variant adds
+\texttt{log(fx/fx\_base)} to each commodity shock, using 2000 FX or the
+first available year; missing FX adjustments are zero. Fine using-sector
+instruments are summed when mapped to grouped KLEMS industries. The output
+is \pkgfile{data/dta/crosscountry_iv.dta}; its unadjusted and FX-adjusted
+instruments are \texttt{shift\_share\_ct} and
+\texttt{shift\_share\_fx\_ct}.
+
+\pkgfile{do/data_cleaning/crosscountry_panel_finalize.do} merges the IV by
+country, industry and year, keeps manufacturing, and excludes Luxembourg
+and Slovakia, compensation above value added, intermediate inputs above
+gross output, \texttt{ii/va>10}, labor shares outside 0.05--0.95, and
+country/industry pairs with fewer than five years. Baseline intensity is
+the year-2000 \texttt{ii/va}, falling back to the first retained year.
+\texttt{treat=mat2va\_base*lii\_pi}; \texttt{va\_base} is the sector's
+baseline value added divided by its country's total across retained
+sectors, using the same year-2000/first-year rule. Rows missing the outcome,
+treatment, FX instrument, wage or weight are excluded. The output
+\pkgfile{data/dta/crosscountry_panel.dta} contains 6,318 observations for
+23 countries over 1995--2019, with key \texttt{country, indcode, year};
+\texttt{ci} identifies country/industry pairs, and the FX instrument is
+renamed \texttt{shift\_share\_fx}. \pkgfile{do/tables/tab4.do} produces
+\pkgfile{output/tables/tab4.tex} from this panel.
+
+\pkgfile{do/figures/fig_crosscountry.do} writes the four
+\pkgfile{figF1a.png}--\pkgfile{figF2b.png} panels to
+\pkgfile{output/figures/}. Figure F.2 chains changes in
+\texttt{ii\_pi/va\_pi} within countries using current/lag intermediate
+expenditure shares. The European aggregation uses
+country intermediate-expenditure totals in their retained source currency
+units; the dashed series subtracts log FX changes from changes in the
+relative-price index before aggregation.
+
+\subsection{Disaster instrument data (Tables D.1--D.3)}
+
+\pkgfile{do/data_cleaning/disaster_iv_construct.do} reads the archived
+EM-DAT workbook and the 1997 BACI trade/country CSVs in
+\pkgfile{data/raw/disaster_iv/}. It retains natural disasters starting in
+1991--2016, excluding epidemics, infestations and animal incidents;
+missing death tolls become zero. A large event meets its country's 90th
+percentile among positive-death events in that full window. The active
+country/year indicator covers the event year and the next two years,
+within the same window. BACI exports are summed from HS6 to HS4; a
+country/product is retained if it supplies at least 5\% of world exports
+of that product and the product is at least 5\% of the country's exports.
+The HS4/year shock sums these exporters' 1997 world shares times the
+active-disaster indicator.
+
+The script maps HS4 shocks through
+\pkgfile{data/raw/Concordances/HS696_to_IOT.dta} using its supplied weights,
+then through \pkgfile{data/dta/IOLinkages.dta} and
+\pkgfile{data/raw/Concordances/IOT_NAICS.dta}. It converts NAICS 1997 to
+NAICS 2012 with \pkgfile{conc_naics97_naics12.dta} in the same concordance
+folder, averaging with annual shipments from
+\pkgfile{data/raw/NBER-CES/nberces_1958-2018.dta}. It merges onto the
+1991--2016 NAICS/year skeleton from \pkgfile{data/dta/mainregfile.dta};
+unmatched instrument values become zero. The output
+\pkgfile{data/dta/disaster_iv_data.dta} has key \texttt{naics, year} and
+contains the dimensionless weighted-exposure instrument \texttt{div\_1}.
+
+\pkgfile{do/tables/tabD1.do} separately constructs the disaster/product
+examples from these sources. \pkgfile{do/tables/tabD2.do} merges
+\texttt{div\_1} into \pkgfile{mainregfile.dta} to estimate the disaster-IV
+specifications; \pkgfile{do/tables/tabD3.do} reports their actual first
+stages on the corresponding estimation samples. Their outputs are
+\pkgfile{output/tables/tabD1.tex}, \pkgfile{tabD2.tex} and
+\pkgfile{tabD3.tex} in the same folder.
+
+\pkgfile{do/tables/tabD1.do} also writes
+\pkgfile{output/tables/tabD1_qualifying_countries.csv}, the full country
+list promised in the note to Table~D.1. It contains one row for each of
+201 countries with a qualifying disaster, before the exporter-specialization
+and top-20 filters: \texttt{iso3}, \texttt{Country},
+\texttt{n\_qualifying} (number of qualifying events), and
+\texttt{threshold} (the country-specific 90th-percentile death toll).
+
+
+\subsection{Quantitative-model variables and numerical construction}
+
+\pkgfile{do/data_cleaning/model_inputs.do} produces the two CSVs using the
+worksheet-level mapping in Table~\ref{tab:model}. Their identifiers are
+\texttt{year} (1998--2023), \texttt{sector\_name} (the BEA category name)
+and \texttt{sector} (the integer encoding of the 22 names). The
+\texttt{sector}--\texttt{year} key is unique. Julia solves the total
+manufacturing series and each of the 19 nonaggregate subsectors separately;
+the durable, nondurable and total aggregates are excluded from the
+subsector loop.
+
+In \pkgfile{quant_model/functions.jl}, \texttt{load\_data} first restricts
+the data to years through \texttt{max\_year}, then HP-filters each source
+series separately with smoothing parameter 5. The model constructs ratios
+\emph{after} filtering the levels:
+\[
+ s_l=\mathrm{Comp}/\mathrm{GOmil},\qquad
+ s_m=\mathrm{Mat}/\mathrm{GOmil},\qquad
+ s_i=\mathrm{Investmentmil}/\mathrm{GOmil},\qquad
+ \lambda=\mathrm{Comp}/\mathrm{VA}.
+\]
+These are fractions, not percentages. The capital and output quantities
+are the BEA indexes \texttt{Cap\_ind} and \texttt{GO\_ind}; the investment
+price is \texttt{Investmentmil}/\texttt{Inv\_ind}, in millions of dollars
+per quantity-index point. Wages are \texttt{Wage}, and materials prices
+are \texttt{Pm}. Expenditure \texttt{R}, passed to the model as \texttt{E},
+is current-dollar \texttt{GOmil}; it is not deflated in this loader.
+An additional call with smoothing zero supplies the unfiltered comparison
+series. Plot normalization is performed in \pkgfile{quant_model/plots.jl}.
+
+\pkgfile{quant_model/main.jl} sets the substitution elasticity to 0.20,
+the adjustment-cost parameter to 0.75, the discount factor to $1/1.03$,
+and the solution horizon to 50 periods. The depreciation parameter is the
+mean of \texttt{Dep} across all 1998--2023 rows in the relevant input
+CSV, before applying the model's 2019 input cutoff. The retained
+1998--2019 input and 1998--2018 results windows are explained in the
+Julia software instructions below.
+
+The main transition routines use outer tolerance $10^{-8}$, maximum
+20,000 iterations, damping 0.9 and investment-share damping 0.7. The
+material-share calculation in \pkgfile{functions.jl} uses an inner
+tolerance of $10^{-12}$ by default and $10^{-14}$ in the scalar
+steady-state calls. These tighter inner tolerances prevent numerical
+error in the nested calculation from stopping outer convergence. The
+verified run completed all 80 outer stages (four for manufacturing and
+four for each subsector) without changing published rounding.
+
+The two counterfactuals, recovered fundamentals and manufacturing
+contribution statistics are calculated in \pkgfile{quant_model/main.jl}
+and serialized to \pkgfile{quant_model/results/results.jls}. The
+manufacturing contribution statistic uses sums of absolute deviations from
+the first observation, as in the paper's formula.
+\pkgfile{quant_model/plots.jl} reads the cache to write the figures and
+compute Table~E.1. That table reports average and endpoint changes in
+labor shares in percentage points: baseline changes are measured from
+the first baseline observation, and the price contributions are baseline
+minus counterfactual labor shares. Its value-added shares divide each
+subsector's average unfiltered \texttt{VA} in 1998--2019 by the sum of
+these averages across the included subsectors and multiply by 100.
+Run \pkgfile{main.jl} first whenever inputs, calibration or model code change.
+
+
+% =====================================================================
+\section{Software Requirements}
+% =====================================================================
+
+\subsection*{Operating system and hardware}
+
+The complete replication was verified on September~10, 2026 under
+Windows~11 Enterprise LTSC (64-bit, build~26100), on an AMD Ryzen
+Threadripper PRO~7975WX (32~physical cores, 64~logical) with 256~GB of RAM.
+StataNow~MP~19.5 was used. These are the tested machine's
+specifications, not minimum hardware requirements.
+The Stata driver uses the package root selected as Stata's working
+directory; Julia resolves its paths from the model directory.
+No high-performance computing, cluster or GPU was used. The largest
+single raw file read is about 517~MB.
+
+\subsection*{Expected running time}
+
+\begin{quote}
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Step} & \textbf{Measured time}\\
+\midrule
+\pkgfile{do/main.do} (all 53 Stata scripts) & 16.43 minutes\\
+\pkgfile{quant_model/main.jl} (model, figures, table) & 79.00 seconds\\
+\addlinespace
+\textbf{Sum of Stata and Julia times} & \textbf{about 18 minutes}\\
+\bottomrule
+\end{tabular}
+\end{quote}
+
+\noindent These timings are from the complete verification run on the
+machine described above. Generated datasets, model inputs, model cache
+and ordinary outputs were absent before execution. Dependencies had
+already been installed; installation on an empty machine was not part
+of this timing. Initial package downloads, building and precompilation
+require additional time that depends on the machine and network.
+
+The unpacked package occupies approximately 38.0~GB (35.4~GiB), including
+26.7~GB of raw inputs and 11.3~GB of non-proprietary CSV copies.
+Analysis datasets are rebuilt by the Stata driver. Allow additional
+writable space for these datasets, temporary files, outputs and software
+dependencies; 38.0~GB describes the supplied files, not peak working
+storage during execution.
+
+PyPlot renders the model figures through matplotlib. The verified Windows
+rendering environment uses Python~3.14.7 (conda-forge), matplotlib~3.11.1,
+NumPy~2.5.3, FreeType~2.14.3, and DejaVu Sans fonts (version~2.35).
+The Julia manifest does not pin these Python and font dependencies.
+Relative to the accepted figures, this environment produces small layout
+shifts (at most 1.13~points, or 0.40~mm); the plotted results agree at the
+paper's reported precision. PDF metadata and rendering may differ across
+environments, so byte-identical PDFs are not expected.
+
+Each Stata figure script calls \pkgfile{do/figures/graph_style.do} to select
+Stata's built-in \texttt{stcolor} scheme and the \texttt{Book Antiqua}
+font. Both pixel width and height are specified for every exported panel,
+matching the accepted figures' dimensions. Book Antiqua is the closest
+tested Windows match to the accepted figures' Palatino-family appearance;
+the exact historical font configuration is unavailable. The font must be
+installed on the machine running Stata; font files are not bundled. If it
+is unavailable, Stata may substitute another font and alter label spacing.
+The scripts restore the caller's previous scheme and font after successful
+execution or a Stata error. These settings apply to standalone figure runs
+as well as the master run. Small glyph and spacing differences can remain
+across font versions and operating systems.
+
+\subsection*{Randomness}
+
+The empirical calculations and numerical model solution are
+deterministic. There is no random sampling, bootstrap or stochastic
+simulation, so no random seed needs to be set.
+
+\subsection*{Stata --- data construction and empirical results}
+
+Stata version~19.5 (StataNow, MP edition) was used. The Stata driver
+\pkgfile{do/main.do} checks for the following user-written packages and
+uses \texttt{ssc install} only when the corresponding command is missing:
+
+\begin{quote}\ttfamily
+labutil, coefplot, unique, gtools, egenmore, ereplace,\\
+reghdfe, ivreg2, ivreghdfe, estout, ranktest, ftools, binscatter,\\
+renvarlab
+\end{quote}
+
+If missing, \texttt{binscatter2} is installed using \texttt{net install}
+from the fixed source revision
+\url{https://raw.githubusercontent.com/mdroste/stata-binscatter2/d4d5c523ff315c2c2cc6105d590894d09cb724e0}.
+The driver preserves existing installations, stops if an installation fails,
+and records the command locations and version headers in
+\pkgfile{replication_run.log}. Downloads require internet access. Missing
+SSC packages are obtained in the versions then available from SSC; their
+historical versions are not pinned or bundled. The September~10, 2026 verification used \texttt{reghdfe}~6.13.1,
+\texttt{ivreghdfe}~1.1.4, \texttt{ivreg2}~4.1.12, \texttt{ftools}~2.50.0,
+\texttt{gtools}~1.10.1, \texttt{estout}~3.33, \texttt{ranktest}~2.0.04,
+\texttt{coefplot}~1.8.8, \texttt{unique}~1.2.4, \texttt{ereplace}~1.0.3,
+\texttt{binscatter}~7.02, \texttt{binscatter2}~0.91,
+and \texttt{renvarlab}~1.0.
+These are the versions reported in the installed command files; the
+\texttt{labutil} and \texttt{egenmore} bundles do not expose a single
+package version in a matching command file.
+
+The model-input builder \pkgfile{do/data_cleaning/model_inputs.do} uses
+only built-in Stata~19 commands; it requires no additional packages.
+
+
+\noindent\textbf{Stata temporary directory.}
+The package-root path and Stata's temporary-directory path may contain
+spaces. Stata's temporary directory must be writable and have sufficient
+free space; its location is shown by \texttt{display c(tmpdir)}.
+On Windows, unpack into a short folder such as \pkgfile{C:/replication}
+and use a short temporary-directory location so that full file paths stay
+below 260 characters. Deeply nested paths can cause Stata Excel exports
+to fail with \texttt{r(603)}, even when spaces are handled correctly.
+
+\subsection*{Julia --- quantitative model}
+
+\noindent\textbf{Model data window and reported years.}
+The model uses annual observations for 1998--2019; \texttt{max\_year = 2019}
+sets the last input year. Recovering fundamentals requires one-period-ahead
+information, so reported model paths and counterfactual contribution statistics
+cover 1998--2018. The 2019 observation supplies the additional information needed
+to recover fundamentals through 2018. The HP filter is applied over the full
+1998--2019 input window.
+
+Julia~1.12.5. The packages loaded in \pkgfile{quant_model/loadpackages.jl} are
+\texttt{LinearAlgebra}, \texttt{Plots}, \texttt{CSV}, \texttt{DataFrames},
+\texttt{StatsBase}, \texttt{LaTeXStrings},
+\texttt{Parameters}, \texttt{Printf} and \texttt{Serialization}.
+
+\texttt{PyPlot} is also required, and is the one dependency that is not
+loaded with \texttt{using}: \pkgfile{quant_model/plots.jl} selects the PyPlot
+backend by calling \texttt{pyplot()}, and Plots finds it as long as it is
+installed. PyPlot in turn needs a Python installation with
+\texttt{matplotlib}; PyCall bootstraps a private Conda one automatically if
+none is found.
+
+\pkgfile{quant_model/loadpackages.jl} activates the supplied environment
+to install missing Julia packages with
+\texttt{Pkg.instantiate()}.
+The verified Julia package versions are recorded in
+\pkgfile{quant_model/Project.toml} and \pkgfile{quant_model/Manifest.toml}.
+Initial installation requires internet access. Python, matplotlib and
+fonts are separate dependencies, as described above; their versions are
+not pinned by the Julia manifest.
+
+
+
+% =====================================================================
+\section{Instructions for Replicators}
+% =====================================================================
+
+\begin{enumerate}
+\item Download the replication package and keep the directory structure intact.
+
+\item In Stata, set the working directory to the package root, the folder
+  containing \pkgfile{do/}, \pkgfile{data/} and \pkgfile{quant_model/}:
+\begin{Verbatim}
+cd "/path/to/Replication"
+\end{Verbatim}
+  Replace the example path with the location of your copy. No code edits
+  are required. The master initializes its root from this working directory,
+  replacing any path left by an earlier run in the same Stata session.
+
+\item Run the master in its entirety:
+\begin{Verbatim}
+do "do/main.do"
+\end{Verbatim}
+  It initializes paths, creates working directories and executes, in order:
+  21 data-cleaning scripts, then 13 figure scripts, then 19 table scripts.
+  The first cleaning script, \pkgfile{do/data_cleaning/model_inputs.do},
+  rebuilds the two quantitative model input files in
+  \pkgfile{quant_model/data/} from the archived BEA workbooks.
+  Figure~2 is a schematic and does not require computational reproduction.
+  It is supplied as \pkgfile{output/figures/fig2.png}.
+  A full transcript of the Stata run is written
+  to \pkgfile{replication_run.log} in the package root.
+
+\item After constructing the model inputs in Stata, open a terminal in
+  the \pkgfile{Replication} package root and run Julia~1.12.5:
+\begin{Verbatim}[fontsize=\small]
+julia --startup-file=no --project=quant_model quant_model/main.jl
+\end{Verbatim}
+  Alternatively, run \pkgfile{quant_model/main.jl} from Julia. The script
+  reads the rebuilt files from \pkgfile{quant_model/data/} and activates
+  the supplied environment on startup. Missing Julia packages are
+  installed automatically as described above.
+
+  To reproduce only the quantitative model, run these Stata commands:
+\begin{Verbatim}
+cd "/path/to/Replication"
+do "do/setup.do"
+do "do/data_cleaning/model_inputs.do"
+\end{Verbatim}
+  Then run \pkgfile{quant_model/main.jl} in Julia. Prebuilt input CSVs are
+  included for convenience; the Stata step reproduces them from the raw
+  workbooks without running the empirical analyses.
+\end{enumerate}
+
+\noindent\textbf{Running an individual Stata script.}
+After the master has installed dependencies and constructed the analysis
+inputs, initialize the root before running a figure or table script. For
+example, to regenerate Table~C.4:
+\begin{Verbatim}
+cd "/path/to/Replication"
+do "do/setup.do"
+do "do/tables/tabC4.do"
+\end{Verbatim}
+The setup script validates the package location and initializes paths; it
+does not install dependencies, build inputs or create working directories.
+Individual scripts require this initialization and the same current working
+directory. If either is missing or inconsistent, they stop with an error.
+Run setup again after changing to another package copy. The model-only
+builder creates its own scratch and output directories and does not require
+a prior empirical run.
+
+
+
+
+\subsection*{Rebuilding this documentation}
+The analysis exports table fragments and figure files; running it does not
+require a \LaTeX{} installation. To rebuild this README, use a separate
+working directory containing \pkgfile{README.tex},
+\pkgfile{data_citations.bib} and \pkgfile{ecta-fullname.bst}, and run:
+\begin{Verbatim}[fontsize=\small]
+pdflatex README.tex
+bibtex README
+pdflatex README.tex
+pdflatex README.tex
+\end{Verbatim}
+The result is \pkgfile{README.pdf}. The required \LaTeX{} packages are
+listed in the source preamble.
+
+% =====================================================================
+\section{Where Output Is Saved, and How It Maps to the Paper}
+% =====================================================================
+
+Stata exhibits are written to \pkgfile{output/tables/} and
+\pkgfile{output/figures/}. Model exhibits are written to
+\pkgfile{quant_model/results/}. Output files are named after the exhibit
+number they produce, so \pkgfile{tabC6.tex} is Table~C.6 and
+\pkgfile{figC3a.png} is the first panel of Figure~C.3.
+
+\noindent\textbf{Numerical summaries outside the exhibit files.}
+The Stata master records displayed regression output and diagnostics in
+\pkgfile{replication_run.log} at the package root. In particular,
+\pkgfile{do/figures/fig7.do} prints the two counterfactual contribution
+percentages under ``Cumulative contribution'' in that log.
+\pkgfile{quant_model/main.jl} prints the manufacturing contribution
+percentages for CF1 and CF2 in the Julia terminal and saves their
+unrounded values as \texttt{contribution\_cf1} and
+\texttt{contribution\_cf2} in
+\pkgfile{quant_model/results/results.jls}. This cache also contains
+the recovered fundamentals and baseline and counterfactual equilibrium
+paths. Julia terminal output is not automatically saved to a separate log.
+These locations supplement the figure and table crosswalk.
+
+\subsection*{Tables}
+
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{5.0cm}>{\raggedright\arraybackslash}p{7.3cm}@{}}
+\toprule
+\textbf{Exhibit} & \textbf{Script} & \textbf{Output file}\\
+\midrule
+\endhead
+Table 1 & \pkgfile{do/tables/tab1.do} & \pkgfile{output/tables/tab1.tex}\\
+Table 2 & \pkgfile{do/tables/tab2.do} & \pkgfile{output/tables/tab2.tex}\\
+Table 3 & \pkgfile{do/tables/tab3.do} & \pkgfile{output/tables/tab3.tex}\\
+Table 4 & \pkgfile{do/tables/tab4.do} & \pkgfile{output/tables/tab4.tex}\\
+Table C.1 & \pkgfile{do/tables/tabC1.do} & \pkgfile{output/tables/tabC1.tex}\\
+Table C.2 & \pkgfile{do/tables/tabC2.do} & \pkgfile{output/tables/tabC2.tex}\\
+Table C.3 & \pkgfile{do/tables/tabC3.do} & \pkgfile{output/tables/tabC3.tex}\\
+Table C.4 & \pkgfile{do/tables/tabC4.do} & \pkgfile{output/tables/tabC4.tex}\\
+Table C.5 & \pkgfile{do/tables/tabC5.do} & \pkgfile{output/tables/tabC5.tex}\\
+Table C.6 & \pkgfile{do/tables/tabC6.do} & \pkgfile{output/tables/tabC6.tex}\\
+Table C.7 & \pkgfile{do/tables/tabC7.do} & \pkgfile{output/tables/tabC7.tex}\\
+Table C.8 & \pkgfile{do/tables/tabC8.do} & \pkgfile{output/tables/tabC8.tex}\\
+Table C.9 & \pkgfile{do/tables/tabC9.do} & \pkgfile{output/tables/tabC9.tex}\\
+Table C.10 & \pkgfile{do/tables/tabC10.do} & \pkgfile{output/tables/tabC10.tex}\\
+Table C.11 & \pkgfile{do/tables/tabC11.do} & \pkgfile{output/tables/tabC11.tex}\\
+Table C.12 & \pkgfile{do/tables/tabC12.do} & \pkgfile{output/tables/tabC12.tex}\\
+Table D.1 & \pkgfile{do/tables/tabD1.do} & \pkgfile{output/tables/tabD1.tex}\\
+Table D.1 country list & \pkgfile{do/tables/tabD1.do} & \pkgfile{output/tables/tabD1_qualifying_countries.csv}\\
+Table D.2 & \pkgfile{do/tables/tabD2.do} & \pkgfile{output/tables/tabD2.tex}\\
+Table D.3 & \pkgfile{do/tables/tabD3.do} & \pkgfile{output/tables/tabD3.tex}\\
+\addlinespace
+Table B.1 & --- & Typeset directly in the paper; no computation\\
+Table E.1 & \pkgfile{quant_model/main.jl} & \pkgfile{quant_model/results/subsector_contributions_table.tex}\\
+\bottomrule
+\end{longtable}
+
+\subsection*{Figures}
+
+Stata filenames below are relative to \pkgfile{output/figures/}; Julia
+filenames are relative to \pkgfile{quant_model/results/}. A range such as
+\texttt{a--c} means three separate files ending in \texttt{\_a.pdf},
+\texttt{\_b.pdf} and \texttt{\_c.pdf}.
+
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{5.0cm}>{\raggedright\arraybackslash}p{7.3cm}@{}}
+\toprule
+\textbf{Exhibit} & \textbf{Script} & \textbf{Output file(s)}\\
+\midrule
+\endhead
+Figure 1 & \pkgfile{do/figures/fig1.do} & \pkgfile{fig1.png}\\
+Figure 3 & \pkgfile{do/figures/fig3.do} & \pkgfile{fig3a.png}, \pkgfile{fig3b.png}, \pkgfile{fig3c.png}\\
+Figure 4 & \pkgfile{do/figures/fig4.do} & \pkgfile{fig4a.png}, \pkgfile{fig4b.png}\\
+Figure 5 & \pkgfile{do/figures/fig5.do} & \pkgfile{fig5a.png}, \pkgfile{fig5b.png}, \pkgfile{fig5a_ld.png}, \pkgfile{fig5b_ld.png}\\
+Figure 6 & \pkgfile{do/figures/fig6.do} & \pkgfile{fig6a.png}, \pkgfile{fig6b.png}\\
+Figure 7 & \pkgfile{do/figures/fig7.do} & \pkgfile{fig7a.png}, \pkgfile{fig7b.png}\\
+Figure B.1 & \pkgfile{do/figures/figB1.do} & \pkgfile{figB1.png}\\
+Figure C.1 & \pkgfile{do/figures/figC1.do} & \pkgfile{figC1.png}\\
+Figure C.2 & \pkgfile{do/figures/figC2.do} & \pkgfile{figC2.png}\\
+Figure C.3 & \pkgfile{do/figures/figC3.do} & \pkgfile{figC3a.png}, \pkgfile{figC3b.png}\\
+Figure C.4 & \pkgfile{do/figures/figC4.do} & \pkgfile{figC4.png}\\
+Figure C.5 & \pkgfile{do/figures/figC5.do} & \pkgfile{figC5.png}\\
+Figures F.1, F.2 & \pkgfile{do/figures/fig_crosscountry.do} & \pkgfile{figF1a.png}, \pkgfile{figF1b.png}, \pkgfile{figF2a.png}, \pkgfile{figF2b.png}\\
+\addlinespace
+Figure 2 & Supplied fixed schematic (no computation) & \pkgfile{output/figures/fig2.png}\\
+Figure 8 & \pkgfile{quant_model/main.jl} & \pkgfile{main_inversion_a-c.pdf}\\
+Figure 9 & \pkgfile{quant_model/main.jl} & \pkgfile{main_counterfactuals_a-f.pdf}\\
+Figure E.1 & \pkgfile{quant_model/main.jl} & \pkgfile{appendix_inversion.pdf}\\
+Figure E.2 & \pkgfile{quant_model/main.jl} & \pkgfile{main_counterfactuals_g.pdf}\\
+Figure E.3 & \pkgfile{quant_model/main.jl} & \pkgfile{appendix_subsector_counterfactuals.pdf}\\
+\bottomrule
+\end{longtable}
+
+
+
+% =====================================================================
+\section{Data Citations}\label{sec:citations}
+% =====================================================================
+
+
+
+\nocite{*}
+\begingroup
+\renewcommand{\section}[2]{}%   suppress the bibliography's own heading
+\bibliographystyle{ecta-fullname}
+\bibliography{data_citations}
+\endgroup
+
+
+
+\end{document}

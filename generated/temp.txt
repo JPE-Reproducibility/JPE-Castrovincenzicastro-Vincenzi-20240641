@@ -1,0 +1,261 @@
+                                 Replication Package
+                            Intermediate Input Prices and the Labor Share
+
+                           Juanma Castro-Vincenzi Benny Kleinman
+
+                                        September 2026
+
+
+           Contents
+
+
+           1 Data Availability Statement 2
+
+           2 Contents of the Replication Package 9
+
+           3 Data Construction and Analysis Variables 10
+             3.1 U.S. industry data and derived variables . . . . . . . . . . . . . . . . . . . . . . . . .11
+             3.2 Regional analysis data (Table 2) . . . . . . . . . . . . . . . . . . . . . . . . . . . . .14
+             3.3 Cross-country analysis data (Table 4 and Figures F.1–F.2) . . . . . . . . . . . . . . .15
+             3.4 Disaster instrument data (Tables D.1–D.3) . . . . . . . . . . . . . . . . . . . . . . .16
+             3.5 Quantitative-model variables and numerical construction . . . . . . . . . . . . . . . .16
+
+           4 Software Requirements 17
+
+           5 Instructions for Replicators 19
+
+           6 Where Output Is Saved, and How It Maps to the Paper 20
+
+           7 Data Citations                                                      22
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                              1           1Data Availability Statement
+
+           All data used in this paper are secondary data obtained from public sources. No primary data were
+           collected. All raw data ffles are included in the replication package. Whenever the raw data ffle is
+           in .dta, .xls or .xlsx format a copy is provided in .csv format. Table 1 lists the raw data families;
+           Table 3 lists the supporting concordances. Together they identify what each ffle contains, where
+           it came from, and its access date where recorded. The ffve BEA workbooks used to construct the
+           quantitative model inputs are included indata/raw/model_inputs/; their original access dates
+           were not recorded. Their embedded source dates and the construction steps are described below.
+           Rebuilding these inputs requires no data downloads.
+
+           Rights and permissions
+           We certify that we have legitimate access to, and permission to use, the data used in this paper.
+           The authors’ code is released under the BSD 3-Clause License. The documentation and the authors’
+           original contributions to derived data and outputs are released under CC BY 4.0, only to the extent
+           that the authors hold those rights. These grants do not relicense third-party material or override
+           its source-data terms.
+             The EM-DAT archive and its format-only CSV copy are distributed under CC BY-NC-ND 4.0,
+           as detailed below and inLICENSE.txt. Other source datasets retain their original providers’ terms.
+
+           EM-DAT archived source, access and reuse
+           The package includesThe EM-DAT Emergency Events Database Archive, version 2.0, archived on
+           30 April 2026 at UCLouvain Dataverse (Delforge, Wathelet, Below, Lanfredi Soffa, Tonnelier, van
+           Loenhout, and Speybroek, 2024). The archive covers 1900–2024 and contains 26,946 records and
+           47 variables. Its permanent identiffer ishttps://doi.org/10.14428/DVN/I0LTPH. The complete
+           workbook260430_emdat_archive.xlsxis included without content changes, under the fflename
+           expected by the existing code:data/raw/disaster_iv/disaster_iv_emdat.xlsx.
+             Access.No registration, payment or application is required to download this archived ffle.
+           The included copy was downloaded on 9 September 2026 (UTC). To obtain the same source, open
+           the DOI, select version 2.0 and download260430_emdat_archive.xlsx, or use the ffxed ffle link
+           https://dataverse.uclouvain.be/api/access/datafile/38893. Save it at the package path
+           above. Its SHA256 checksum is21c210e479623144cef32c11c0a57c21094ea66f4ad0a0a248d823
+           9f3a5e9847. The data-column deffnitions and archived documentation are available with the same
+           repository deposit. No download is needed when using the bundled copy.
+             Non-proprietary copy.A UTF-8 CSV copy of the entireEM-DAT Dataworksheet is included
+           atdata/raw_csv_copy/disaster_iv/disaster_iv_emdat__EM-DAT_Data.csv. It preserves
+           all records, column names and cell values; only the ffle format changes. The original archived
+           workbook has no separateEM-DAT Infoworksheet.
+             Reuse conditions.The provider releases this archive under Creative Commons Attribution–
+           NonCommercial–NoDerivatives 4.0 International (CC BY-NC-ND 4.0):https://creativecommon
+           s.org/licenses/by-nc-nd/4.0/. Noncommercial sharing of the unadapted archive is permitted
+           with attribution and the licence notice retained. A faithful change of ffle format is permitted. The
+           licence does not permit sharing adapted material under its grant; the authors’ BSD and CC BY
+           licences do not replace these EM-DAT terms. The source attribution, format-conversion notice and
+           licence link are recorded inLICENSE.txt.
+             Analysis sample and veriffcation.The disaster-instrument code and Table D.1 use events
+           with Start Year 1991–2016, Disaster GroupNatural, excludingEpidemic,Infestationand
+
+                                              2           Animal incident. The 8,484 selected events and all seven ffelds read by these routines (Disaster
+           Group, Disaster Type, ISO, Start Year, Total Deaths, Country and Disaster Subtype) match
+           the earlier 27 February 2026 living-data extract. An isolated run with the archived workbook
+           and unchanged code reproduced the contents of Tables D.1–D.3 exactly. The complete source
+           workbooks differ in unused ffelds, other years and row order; the February living-data extract is
+           not the archived ffle and is not included in this package. The applicable redistribution terms are
+           those of the archived product, rather than those of the living-data portal.
+
+                                          Table 1: Raw data ffles
+
+           File(s) Description URL Accessed
+
+           aggregate/WPSID61.csvProducer price index for       https://fred.stl   Mar 2026
+                                processed goods for           ouisfed.org/seri
+                                intermediate demand.         es/WPSID61
+           aggregate/14 further    Producer, consumer and GDP   https:            Mar 2026
+           FRED series           price indices, exchange rates,    //fred.stlouisfe
+                                manufacturing earnings and     d.org/series/<ID>
+                                BLS productivity:WPSID62,
+                                WPSFD49201,WPSFD49207,
+                                PRS85006173,GDP,GDPDEF,
+                                DGDSRG3M086SBEA,
+                                LCEAMN01USQ189S,
+                                NAGIGP01EZQ661S,
+                                JPNGDPDEFQISMEI,
+                                CCUSMA02EZQ618N,
+                                CCUSMA02JPQ618N,
+                                GOODS0EU28M086NEST,
+                                PITGCG02EZA661N.
+           aggregate/nipaQuarte   BEA National Income and      https:            Mar 2026
+           rly.csv              Product Accounts, quarterly.    //apps.bea.gov/n
+                                                          ational/Release/
+                                                          TXT/NipaDataQ.txt
+           aggregate/fernald.xl   Fernald utilisation-adjusted     https://www.frbs   Mar 2026
+           sx                   quarterly TFP.              f.org/economic-r
+                                                          esearch/files/qu
+                                                          arterly_tfp.xlsx
+           aggregate/BEA_GDPbyI   BEA historical industry        https:            Jul 2026
+           nd_SIC_1947-1997.xls   accounts: value added, gross    //apps.bea.gov/i
+                                output, compensation and      ndustry/xls/GDPb
+                                wages by industry, 1947–1997.   yInd_VA_SIC.xls
+           aggregate/BEA_GDPbyI   BEA GDP by Industry, value    current release:      Oct 2019
+           nd_ValueAdded.xlsx     added by industry, 1997–2018.   https://www.bea.
+                                                          gov/data/gdp/gdp
+                                                          -industry
+           aggregate/BEA_GDPbyI   BEA GDP by Industry, gross    current release:      Oct 2019
+           nd_GrossOutput.xlsx    output by industry, 1997–2018.  https://www.bea.
+                                                          gov/data/gdp/gdp
+                                                          -industry
+
+
+
+
+                                                  3           Table 1 continued
+
+           File(s) Description URL Accessed
+
+           aggregate/BEA_NIPA_S   NIPA Section 6, December 2019  current release:      Not veriffed
+           ection6_Dec2019.xlsx   workbook; the annual Tables    https:
+                                6.2D and 6.3D used here were   //apps.bea.gov/n
+                                published July 30, 2019.        ational/Release/
+                                                          XLS/Survey/Secti
+                                                          on6all_xls.xlsx
+           model_inputs/income_   BEA NIPA Section 6, archived   https:            Not recorded
+           emp_tab.xlsx          workbook used for model       //apps.bea.gov/n
+                                compensation and wages.       ational/Release/
+                                                          XLS/Survey/Secti
+                                                          on6All_xls.xlsx
+           model_inputs/gross_o   BEA GDP by Industry,        https:            Not recorded
+           utput_tab.xlsx        archived gross output levels and  //apps.bea.gov/i
+                                quantity indexes for the model.  ndustry/Release/
+                                                          XLS/GDPxInd/Gros
+                                                          sOutput.xlsx
+           model_inputs/int_inp   BEA GDP by Industry, archived https://apps.bea   Not recorded
+           ut_tab.xlsx           intermediate input levels and    .gov/industry/Re
+                                price indexes for the model.     lease/XLS/GDPxIn
+                                                          d/IntermediateIn
+                                                          puts.xlsx
+           model_inputs/value_a   BEA GDP by Industry, archived https://apps.bea   Not recorded
+           dded_tab.xlsx         value added levels for the model. .gov/industry/Re
+                                                          lease/XLS/GDPxIn
+                                                          d/ValueAdded.xlsx
+           model_inputs/fixed_a   BEA Fixed Assets Section 3,    https://apps.bea   Not recorded
+           ssets_tab.xlsx        archived capital, depreciation    .gov/national/Fi
+                                and investment data for the     xedAssets/Releas
+                                model.                    e/XLS/Section3Al
+                                                          l_xls.xlsx
+           external_gas_prices.   EIA annual natural gas import   https://www.eia.   Mar 2026
+           csv                  prices for HS 271111 and       gov/dnav/ng/hist
+                                271121.                    /n9103us3a.htm
+           BEA-KLEMS/BEA-BLS-ind  BEA–BLS Integrated          https:            Sep 2023
+           ustry-level-productio  Industry-Level Production      //www.bea.gov/si
+           n-account-1987-2021.   Account, the U.S. KLEMS      tes/default/file
+           xlsx                 accounts.                  s/2023-09/BEA-BLS
+                                                          -industry-level-p
+                                                          roduction-account
+                                                          -1987-2021.xlsx
+           BIS/mod.csvDaily US dollar exchange rates.https://data.bis   Oct 2023
+                                                          .org/topics/XRU
+           census/NAICSUseDetai   BEA 1997 benchmark         https://apps.bea   Jul 2026
+           l.txt                Input-Output Use table at      .gov/industry/zi
+                                NAICS detail.               p/ndn0306.zip
+
+
+
+
+
+                                                  4           Table 1 continued
+
+           File(s) Description URL Accessed
+
+           census/concentration   Economic Census concentration  URLs listed in       Jul 2026
+           _ratios/1997/,         ratios (CR4, CR8, CR20, CR50,  census/concentra
+           census/concentration   HHI).                     tion_ratios/SOUR
+           _ratios/2002/,                                  CE_URLS.txt
+           census/concentration
+           _ratios/2007/,
+           census/concentration
+           _ratios/2012/— 46
+           .datffles
+           cepii_tuv/tuv_96_x_2   CEPII Trade Unit Values, HS96  https://www.cepi   Jul 2026
+           000.csvthrough        export regime               i.fr/CEPII/en/bd
+           tuv_96_x_2016.csv(17                            d_modele/bdd_mod
+           ffles)                                           ele_item.asp?id=2
+           comtrade/comtrade_19   UN Comtrade U.S. imports     https://comtrade   Feb 2026
+           91.csvthrough         from world, HS 1992 (H0),      plus.un.org/
+           comtrade_2016.csv(6    covering 1991–2020 in six
+           ffles)                 ffve-year blocks. The 182,348
+                                rows include HS6 records and
+                                other aggregation levels.
+           disaster_iv/disaster   CEPII BACI bilateral trade for  https:            Mar 2026
+           _iv_baci_trade_1997.   1997 and its country dictionary  //www.cepii.fr/C
+           csv,disaster_iv_baci   - version V202501.            EPII/en/bdd_mode
+           _country_codes.csv                              le/bdd_modele_it
+                                                          em.asp?id=37
+           disaster_iv/disaster   Offfcial EM-DAT Archive,      https:            9 Sep 2026
+           _iv_emdat.xlsx        version 2.0, 30 April 2026;      //doi.org/10.144   (UTC)
+                                1900–2024. CC BY-NC-ND 4.0.  28/DVN/I0LTPH
+           EUKLEMS/EUKLEMS_2025   EU KLEMS 2025 release.https:            Mar 2026
+           vintage_national_acc                             //euklems-intanpr
+           ounts.dta,..._capita                            od-llee.luiss.it/
+           l_accounts.dta
+           EUKLEMS/EUKLEMS_2020   EU KLEMS 2019 release.https://euklems.   Mar 2026
+           vintage.dta                                    eu/bulk/Statisti
+                                                          cal_National-Acc
+                                                          ounts.dta
+           EUKLEMS/WorldKLEMS_C   World KLEMS accounts for     http:             Mar 2026
+           anada_2012.xlsx,       Canada (2012 release) and      //www.worldklems
+           WorldKLEMS_Korea_201   Korea (2015 release).          .net/data/basic/
+           5.xlsx
+           EUKLEMS/WIOD/43       WIOD 2016 release national     https://www.rug.   Mar 2026
+           workbooks,            input-output tables.           nl/ggdc/valuecha
+           AUS_NIOT_nov16.xlsx                             in/wiod/wiod-201
+           through                                        6-release
+           USA_NIOT_nov16.xlsx
+
+
+
+
+
+
+                                                  5
