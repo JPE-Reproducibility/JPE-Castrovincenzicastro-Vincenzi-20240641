@@ -1,6 +1,11 @@
-title: "Stand-in title"
-author: "Dr Prof James 'JayJay' Author"
-paper_id: 12345678
+title: "Intermediate Input Prices and the Labor Share"
+author: "Castro-Vincenzi"
 round: 1
-repo: "https://www.github.com/standin"
-dropbox_rel_path: "JPE/Author-12345678/1"
+repo: "https://github.com/JPE-Reproducibility/JPE-Castrovincenzicastro-Vincenzi-20240641"
+paper_id: 20240641
+journal: "JPE"
+paper_slug: "Castrovincenzicastro-Vincenzi-20240641"
+dropbox_rel_path: "JPE/Castrovincenzicastro-Vincenzi-20240641/1"
+package_size_gb: 6.36
+package_max_file_size_gb: 2
+package_max_pkg_size_gb: 10
