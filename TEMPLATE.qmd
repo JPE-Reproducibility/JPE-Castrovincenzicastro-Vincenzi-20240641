@@ -779,6 +779,9 @@ r(9);
 
 # Findings {#sec-findings}
 
+- Computational and Time requirements missing
+- Table C12 had a discrepancy between what variable is being used in the output vs the paper.
+
 ## Missing Requirements
 
 - [x] Computational Requirements specified as follows:
